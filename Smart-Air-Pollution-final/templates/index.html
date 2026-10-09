@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirHealth | Smart Air Pollution Health Impact Analytics</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">🌿 <span>AirHealth</span></div>
+    <div class="live-status"><span></span> Live environmental analytics</div>
+</header>
+
+<main>
+    <!-- HOME -->
+    <section id="home-page" class="page">
+        <div class="container">
+            <section class="hero">
+                <div>
+                    <div class="eyebrow">AI-POWERED ENVIRONMENTAL ANALYTICS</div>
+                    <h1>Smart Air Pollution<br><em>Health Impact Analytics</em></h1>
+                    <p>Analyze air pollutants, screen pollution-related health risk, understand potential impacts, and make travel-aware decisions.</p>
+                </div>
+                <div class="hero-art">🌍</div>
+            </section>
+
+            <section class="action-grid">
+                <button class="primary-action" onclick="getLocation()">
+                    <span>📍</span><div><strong>Use My Current Location</strong><small>Analyze the air around you</small></div>
+                </button>
+                <button class="secondary-action" onclick="openTravelPage()">
+                    <span>✈️</span><div><strong>Travel Pollution Analysis</strong><small>Compare a journey before travelling</small></div>
+                </button>
+            </section>
+
+            <section class="search-card">
+                <div>
+                    <div class="section-label">LOCATION SEARCH</div>
+                    <h2>Check Any City or Town</h2>
+                    <p>Search a location to get its current modelled pollution and ML health-risk screening.</p>
+                </div>
+                <div class="search-row">
+                    <input id="location-search" type="text" placeholder="Example: Erode, Coimbatore, Madurai">
+                    <button onclick="searchLocationAnalysis()">Analyze</button>
+                </div>
+            </section>
+
+            <section class="feature-section">
+                <div class="section-label">CORE MODULES</div>
+                <h2>What the system provides</h2>
+                <div class="feature-grid">
+                    <article><span>🧠</span><h3>Random Forest Risk Screening</h3><p>Uses the trained model with seven pollutant features.</p></article>
+                    <article><span>🌫️</span><h3>Pollutant Analytics</h3><p>PM2.5, PM10, NO₂, NH₃, CO, SO₂ and O₃.</p></article>
+                    <article><span>🫁</span><h3>Potential Health Impacts</h3><p>Highlights the pollutants most relevant to the screening.</p></article>
+                    <article><span>🛡️</span><h3>Precautions</h3><p>Provides risk-aware practical precautions.</p></article>
+                    <article><span>🗺️</span><h3>Route Analysis</h3><p>Maps a road journey and samples pollution along the route.</p></article>
+                    <article><span>⏱️</span><h3>ETA Forecast</h3><p>Uses hourly air-quality forecasts at route sample points.</p></article>
+                </div>
+            </section>
+
+            <div class="disclaimer">⚠️ <strong>Screening only:</strong> this project provides environmental pollution and potential health-impact screening. It is not a medical diagnosis or a measurement of personal inhaled dose.</div>
+        </div>
+    </section>
+
+    <!-- ANALYSIS -->
+    <section id="current-page" class="page hidden">
+        <div class="container">
+            <button class="back-btn" onclick="showPage('home-page')">← Back to Home</button>
+
+            <section class="location-header">
+                <div>
+                    <div class="section-label">LOCATION ANALYSIS</div>
+                    <h1 id="current-location-name">Location</h1>
+                    <p id="analysis-time">Live/modelled air-quality conditions</p>
+                </div>
+                <div class="location-icon">📍</div>
+            </section>
+
+            <section class="risk-card" id="risk-card">
+                <div>
+                    <div class="section-label">POLLUTION-BASED HEALTH RISK</div>
+                    <h2 id="risk-level">--</h2>
+                    <p id="risk-description">Waiting for analysis...</p>
+                </div>
+                <div id="risk-icon" class="risk-icon">🌿</div>
+            </section>
+
+            <section>
+                <div class="section-heading"><span>🌫️</span><div><h2>Air Quality Indicators</h2><p>Current/modelled pollutant concentrations returned by Open-Meteo.</p></div></div>
+                <div class="pollution-grid">
+                    <div class="pollution-card"><span>PM2.5</span><strong id="pm25">--</strong><small>µg/m³</small></div>
+                    <div class="pollution-card"><span>PM10</span><strong id="pm10">--</strong><small>µg/m³</small></div>
+                    <div class="pollution-card"><span>NO₂</span><strong id="no2">--</strong><small>µg/m³</small></div>
+                    <div class="pollution-card"><span>NH₃</span><strong id="nh3">--</strong><small>µg/m³</small></div>
+                    <div class="pollution-card"><span>CO</span><strong id="co">--</strong><small>mg/m³</small></div>
+                    <div class="pollution-card"><span>SO₂</span><strong id="so2">--</strong><small>µg/m³</small></div>
+                    <div class="pollution-card"><span>O₃</span><strong id="o3">--</strong><small>µg/m³</small></div>
+                </div>
+            </section>
+
+            <section class="info-section">
+                <div class="section-heading"><span>🫁</span><div><h2>Potential Health Impacts</h2><p>Interpretation based on the detected pollutant levels.</p></div></div>
+                <div id="health-impacts" class="impact-grid"></div>
+            </section>
+
+            <section class="info-section">
+                <div class="section-heading"><span>🛡️</span><div><h2>Recommended Precautions</h2><p>Risk-aware practical actions for the current conditions.</p></div></div>
+                <div id="precautions" class="precaution-grid"></div>
+            </section>
+
+            <section class="forecast-card" id="destination-forecast-card">
+                <div class="section-heading"><span>⏱️</span><div><h2>Next-Hour Air Quality Outlook</h2><p>Forecast screening for the selected location.</p></div></div>
+                <div id="forecast-summary" class="forecast-summary">Loading forecast...</div>
+            </section>
+
+            <section class="travel-next-card">
+                <div><span>✈️</span><div><h2>Planning to Travel?</h2><p>Compare current pollution, route exposure and ETA forecast.</p></div></div>
+                <button onclick="openTravelPage()">Travel Analysis →</button>
+            </section>
+
+            <div class="disclaimer">⚠️ Environmental data are modelled estimates. Health-impact text is general information and not medical advice.</div>
+        </div>
+    </section>
+
+    <!-- TRAVEL -->
+    <section id="travel-page" class="page hidden">
+        <div class="container">
+            <button class="back-btn" onclick="showPage('home-page')">← Back to Home</button>
+
+            <section class="travel-header">
+                <div class="travel-icon">✈️</div>
+                <div><div class="section-label">TRAVEL POLLUTION ANALYSIS</div><h1>Compare Your Journey</h1><p>Route the journey, sample pollution at multiple points, and estimate conditions near arrival time.</p></div>
+            </section>
+
+            <section class="travel-form-card">
+                <div class="section-heading"><span>📍</span><div><h2>Select Journey</h2><p>Enter a start and destination. Use current location when appropriate.</p></div></div>
+                <div class="travel-grid">
+                    <div class="field"><label>From</label><div class="input-wrap"><span>📍</span><input id="travel-from" placeholder="Example: Sathyamangalam"></div><button class="text-button" onclick="setTravelCurrentLocation()">📍 Use My Current Location</button></div>
+                    <div class="field"><label>To</label><div class="input-wrap"><span>🏁</span><input id="destination" placeholder="Example: Erode"></div></div>
+                </div>
+                <div class="field"><label>Travel Mode</label><div class="travel-modes">
+                    <label><input type="radio" name="travel-mode" value="car" checked> 🚗 Car</label>
+                    <label><input type="radio" name="travel-mode" value="bike"> 🏍️ Two-Wheeler</label>
+                    <label><input type="radio" name="travel-mode" value="bus"> 🚌 Bus</label>
+                    <label><input type="radio" name="travel-mode" value="train"> 🚆 Train</label>
+                    <label><input type="radio" name="travel-mode" value="walk"> 🚶 Walking</label>
+                    <label><input type="radio" name="travel-mode" value="cycle"> 🚲 Bicycle</label>
+                </div></div>
+                <button class="compare-button" onclick="compareTravel()">🔎 Analyze Travel Pollution</button>
+            </section>
+
+            <section id="travel-result" class="travel-result"></section>
+            <section id="travel-map-section" class="map-section hidden"><div class="section-heading"><span>🗺️</span><div><h2>Road Route & Pollution Points</h2><p>Markers show sampled route locations and their forecast risk near estimated arrival time.</p></div></div><div id="travel-map"></div></section>
+            <section id="travel-chart-section" class="chart-section hidden"><div class="section-heading"><span>📊</span><div><h2>Pollution Comparison</h2><p>Current/modelled pollutant levels at the start and destination.</p></div></div><div class="chart-wrap"><canvas id="pollutionChart"></canvas></div></section>
+
+            <div class="disclaimer">⚠️ Route pollution is an environmental screening estimate based on modelled forecast data sampled along a road route. It is not a direct measurement of roadside exposure.</div>
+        </div>
+    </section>
+</main>
+
+<footer><strong>Smart Air Pollution Health Impact Analytics System</strong><span>AI • Machine Learning • Environmental Analytics • Route Screening</span></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/script.js"></script>
+</body>
+</html>
