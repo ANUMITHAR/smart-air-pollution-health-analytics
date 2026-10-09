@@ -1,0 +1,12 @@
+.venv/
+.venv313/
+Smart-Air-Pollution-final/.venv/
+Smart-Air-Pollution-final/.venv313/
+
+__pycache__/
+*.pyc
+*.pyo
+
+.vscode/
+.env
+.vercel/
